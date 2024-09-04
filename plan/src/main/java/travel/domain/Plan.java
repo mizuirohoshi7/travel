@@ -38,15 +38,6 @@ public class Plan {
 
     @PostPersist
     public void onPostPersist() {
-        PlanCreated planCreated = new PlanCreated(this);
-        planCreated.publishAfterCommit();
-
-        PlanUpdated planUpdated = new PlanUpdated(this);
-        planUpdated.publishAfterCommit();
-
-        PlanDeleted planDeleted = new PlanDeleted(this);
-        planDeleted.publishAfterCommit();
-
         RecommendationCreated recommendationCreated = new RecommendationCreated(
             this
         );
@@ -56,10 +47,22 @@ public class Plan {
             this
         );
         recommendationRequired.publishAfterCommit();
+
+        PlanCreated planCreated = new PlanCreated(this);
+        planCreated.publishAfterCommit();
+    }
+
+    @PostUpdate
+    public void onPostUpdate() {
+        PlanUpdated planUpdated = new PlanUpdated(this);
+        planUpdated.publishAfterCommit();
     }
 
     @PreRemove
-    public void onPreRemove() {}
+    public void onPreRemove() {
+        PlanDeleted planDeleted = new PlanDeleted(this);
+        planDeleted.publishAfterCommit();
+    }
 
     public static PlanRepository repository() {
         PlanRepository planRepository = PlanApplication.applicationContext.getBean(

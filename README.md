@@ -24,7 +24,6 @@ See the README.md files inside the each microservices directory:
 - member
 - notification
 - follow
-- token
 
 
 ## Run API Gateway (Spring Gateway)
@@ -40,6 +39,7 @@ mvn spring-boot:run
 ```
 - member
 ```
+ http :8088/members id="id" oauthId="oauthId" name="name" email="email" tokenAmount="tokenAmount" 
 ```
 - notification
 ```
@@ -48,10 +48,6 @@ mvn spring-boot:run
 - follow
 ```
  http :8088/follows id="id" fromId="fromId" toId="toId" 
-```
-- token
-```
- http :8088/ 
 ```
 
 

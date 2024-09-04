@@ -12,6 +12,9 @@ import travel.infra.AbstractEvent;
 public class NotificationCreated extends AbstractEvent {
 
     private Long id;
+    private Long memberId;
+    private String details;
+    private Date createdAt;
 
     public NotificationCreated(Notification aggregate) {
         super(aggregate);

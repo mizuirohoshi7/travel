@@ -12,6 +12,10 @@ import travel.infra.AbstractEvent;
 public class MemberCreated extends AbstractEvent {
 
     private Long id;
+    private String oauthId;
+    private String name;
+    private String email;
+    private Integer tokenAmount;
 
     public MemberCreated(Member aggregate) {
         super(aggregate);

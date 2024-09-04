@@ -8,15 +8,14 @@ Vue.use(Router);
 import PlanPlanManager from "./components/listers/PlanPlanCards"
 import PlanPlanDetail from "./components/listers/PlanPlanDetail"
 
+import MemberMemberManager from "./components/listers/MemberMemberCards"
+import MemberMemberDetail from "./components/listers/MemberMemberDetail"
 
 import NotificationNotificationManager from "./components/listers/NotificationNotificationCards"
 import NotificationNotificationDetail from "./components/listers/NotificationNotificationDetail"
 
 import FollowFollowManager from "./components/listers/FollowFollowCards"
 import FollowFollowDetail from "./components/listers/FollowFollowDetail"
-
-import Manager from "./components/listers/Cards"
-import Detail from "./components/listers/Detail"
 
 
 export default new Router({
@@ -34,6 +33,16 @@ export default new Router({
                 component: PlanPlanDetail
             },
 
+            {
+                path: '/members/members',
+                name: 'MemberMemberManager',
+                component: MemberMemberManager
+            },
+            {
+                path: '/members/members/:id',
+                name: 'MemberMemberDetail',
+                component: MemberMemberDetail
+            },
 
             {
                 path: '/notifications/notifications',
@@ -55,17 +64,6 @@ export default new Router({
                 path: '/follows/follows/:id',
                 name: 'FollowFollowDetail',
                 component: FollowFollowDetail
-            },
-
-            {
-                path: '//',
-                name: 'Manager',
-                component: Manager
-            },
-            {
-                path: '///:id',
-                name: 'Detail',
-                component: Detail
             },
 
 

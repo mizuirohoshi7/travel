@@ -38,7 +38,7 @@ public class Notification {
     }
 
     //<<< Clean Arch / Port Method
-    public static void createNotification(FollowToggled followToggled) {
+    public static void createNotification(FollowCreated followCreated) {
         //implement business logic here:
 
         /** Example 1:  new item 
@@ -51,7 +51,7 @@ public class Notification {
 
         /** Example 2:  finding and process
         
-        repository().findById(followToggled.get???()).ifPresent(notification->{
+        repository().findById(followCreated.get???()).ifPresent(notification->{
             
             notification // do something
             repository().save(notification);

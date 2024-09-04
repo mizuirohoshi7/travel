@@ -36,7 +36,14 @@
                     text
                     @click="save"
                 >
-                    ToggleFollow
+                    CreateFollow
+                </v-btn>
+                <v-btn
+                    color="primary"
+                    text
+                    @click="save"
+                >
+                    DeleteFollow
                 </v-btn>
                 <v-btn
                     color="primary"

@@ -46,6 +46,17 @@
                     </v-list-item>
 
 
+                    <v-list-item
+                        class="px-2"
+                        key="members"
+                        to="/members/members"
+                        @click="changeUrl()"
+                        color="primary"
+                        style="font-weight:700;"
+                    >
+                        Member
+                    </v-list-item>
+
 
                     <v-list-item
                         class="px-2"
@@ -68,18 +79,6 @@
                         style="font-weight:700;"
                     >
                         Follow
-                    </v-list-item>
-
-
-                    <v-list-item
-                        class="px-2"
-                        key=""
-                        to="//"
-                        @click="changeUrl()"
-                        color="primary"
-                        style="font-weight:700;"
-                    >
-                        
                     </v-list-item>
 
 
@@ -169,6 +168,13 @@ export default {
                 ImageUrl: '',
             },
             { 
+                title: 'Member', 
+                description: '', 
+                key: 'members', 
+                route: '/members/members',
+                ImageUrl: '',
+            },
+            { 
                 title: 'Notification', 
                 description: '', 
                 key: 'notifications', 
@@ -180,13 +186,6 @@ export default {
                 description: '', 
                 key: 'follows', 
                 route: '/follows/follows',
-                ImageUrl: '',
-            },
-            { 
-                title: '', 
-                description: '', 
-                key: '', 
-                route: '//',
                 ImageUrl: '',
             },
             

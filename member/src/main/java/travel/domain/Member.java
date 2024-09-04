@@ -6,6 +6,10 @@ import java.util.List;
 import javax.persistence.*;
 import lombok.Data;
 import travel.MemberApplication;
+import travel.domain.MemberCreated;
+import travel.domain.TokenDecreased;
+import travel.domain.TokenDecreasingFailed;
+import travel.domain.TokenIncreased;
 
 @Entity
 @Table(name = "Member_table")
@@ -24,6 +28,26 @@ public class Member {
     private String email;
 
     private Integer tokenAmount;
+
+    @PostPersist
+    public void onPostPersist() {
+        MemberCreated memberCreated = new MemberCreated(this);
+        memberCreated.publishAfterCommit();
+
+        TokenDecreased tokenDecreased = new TokenDecreased(this);
+        tokenDecreased.publishAfterCommit();
+
+        TokenDecreasingFailed tokenDecreasingFailed = new TokenDecreasingFailed(
+            this
+        );
+        tokenDecreasingFailed.publishAfterCommit();
+    }
+
+    @PostUpdate
+    public void onPostUpdate() {
+        TokenIncreased tokenIncreased = new TokenIncreased(this);
+        tokenIncreased.publishAfterCommit();
+    }
 
     public static MemberRepository repository() {
         MemberRepository memberRepository = MemberApplication.applicationContext.getBean(
@@ -44,8 +68,8 @@ public class Member {
 
         TokenDecreased tokenDecreased = new TokenDecreased(member);
         tokenDecreased.publishAfterCommit();
-        TokenDecreaseFailed tokenDecreaseFailed = new TokenDecreaseFailed(member);
-        tokenDecreaseFailed.publishAfterCommit();
+        TokenDecreasingFailed tokenDecreasingFailed = new TokenDecreasingFailed(member);
+        tokenDecreasingFailed.publishAfterCommit();
         */
 
         /** Example 2:  finding and process
@@ -57,8 +81,8 @@ public class Member {
 
             TokenDecreased tokenDecreased = new TokenDecreased(member);
             tokenDecreased.publishAfterCommit();
-            TokenDecreaseFailed tokenDecreaseFailed = new TokenDecreaseFailed(member);
-            tokenDecreaseFailed.publishAfterCommit();
+            TokenDecreasingFailed tokenDecreasingFailed = new TokenDecreasingFailed(member);
+            tokenDecreasingFailed.publishAfterCommit();
 
          });
         */

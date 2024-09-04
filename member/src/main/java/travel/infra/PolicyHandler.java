@@ -17,7 +17,28 @@ import travel.domain.*;
 @Transactional
 public class PolicyHandler {
 
+    @Autowired
+    MemberRepository memberRepository;
+
     @StreamListener(KafkaProcessor.INPUT)
     public void whatever(@Payload String eventString) {}
+
+    @StreamListener(
+        value = KafkaProcessor.INPUT,
+        condition = "headers['type']=='RecommendationRequired'"
+    )
+    public void wheneverRecommendationRequired_DecreaseToken(
+        @Payload RecommendationRequired recommendationRequired
+    ) {
+        RecommendationRequired event = recommendationRequired;
+        System.out.println(
+            "\n\n##### listener DecreaseToken : " +
+            recommendationRequired +
+            "\n\n"
+        );
+
+        // Sample Logic //
+        Member.decreaseToken(event);
+    }
 }
 //>>> Clean Arch / Inbound Adaptor

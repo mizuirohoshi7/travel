@@ -9,20 +9,19 @@ import travel.infra.AbstractEvent;
 //<<< DDD / Domain Event
 @Data
 @ToString
-public class RecommendationRequired extends AbstractEvent {
+public class TokenDecreased extends AbstractEvent {
 
     private Long id;
-    private Long memberId;
-    private String location;
-    private Date travelDate;
-    private Integer budget;
-    private Integer groupSize;
+    private String oauthId;
+    private String name;
+    private String email;
+    private Integer tokenAmount;
 
-    public RecommendationRequired(Plan aggregate) {
+    public TokenDecreased(Member aggregate) {
         super(aggregate);
     }
 
-    public RecommendationRequired() {
+    public TokenDecreased() {
         super();
     }
 }

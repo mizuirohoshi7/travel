@@ -10,4 +10,8 @@ import travel.infra.AbstractEvent;
 public class TokenDecreased extends AbstractEvent {
 
     private Long id;
+    private String oauthId;
+    private String name;
+    private String email;
+    private Integer tokenAmount;
 }

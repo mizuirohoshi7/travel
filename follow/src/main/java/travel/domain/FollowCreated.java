@@ -9,20 +9,17 @@ import travel.infra.AbstractEvent;
 //<<< DDD / Domain Event
 @Data
 @ToString
-public class RecommendationRequired extends AbstractEvent {
+public class FollowCreated extends AbstractEvent {
 
     private Long id;
-    private Long memberId;
-    private String location;
-    private Date travelDate;
-    private Integer budget;
-    private Integer groupSize;
+    private Long fromId;
+    private Long toId;
 
-    public RecommendationRequired(Plan aggregate) {
+    public FollowCreated(Follow aggregate) {
         super(aggregate);
     }
 
-    public RecommendationRequired() {
+    public FollowCreated() {
         super();
     }
 }

@@ -25,14 +25,14 @@ public class PolicyHandler {
 
     @StreamListener(
         value = KafkaProcessor.INPUT,
-        condition = "headers['type']=='FollowToggled'"
+        condition = "headers['type']=='FollowCreated'"
     )
-    public void wheneverFollowToggled_CreateNotification(
-        @Payload FollowToggled followToggled
+    public void wheneverFollowCreated_CreateNotification(
+        @Payload FollowCreated followCreated
     ) {
-        FollowToggled event = followToggled;
+        FollowCreated event = followCreated;
         System.out.println(
-            "\n\n##### listener CreateNotification : " + followToggled + "\n\n"
+            "\n\n##### listener CreateNotification : " + followCreated + "\n\n"
         );
 
         // Sample Logic //

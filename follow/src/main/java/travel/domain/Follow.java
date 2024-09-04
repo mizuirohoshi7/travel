@@ -6,7 +6,8 @@ import java.util.List;
 import javax.persistence.*;
 import lombok.Data;
 import travel.FollowApplication;
-import travel.domain.FollowToggled;
+import travel.domain.FollowCreated;
+import travel.domain.FollowDeleted;
 
 @Entity
 @Table(name = "Follow_table")
@@ -24,8 +25,14 @@ public class Follow {
 
     @PostPersist
     public void onPostPersist() {
-        FollowToggled followToggled = new FollowToggled(this);
-        followToggled.publishAfterCommit();
+        FollowCreated followCreated = new FollowCreated(this);
+        followCreated.publishAfterCommit();
+    }
+
+    @PreRemove
+    public void onPreRemove() {
+        FollowDeleted followDeleted = new FollowDeleted(this);
+        followDeleted.publishAfterCommit();
     }
 
     public static FollowRepository repository() {
