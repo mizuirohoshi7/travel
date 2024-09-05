@@ -89,7 +89,7 @@
             this.newValue = {
                 'memberId': 0,
                 'details': '',
-                'createdAt': '2024-09-04',
+                'createdAt': '2024-09-05',
             }
         },
         methods: {
