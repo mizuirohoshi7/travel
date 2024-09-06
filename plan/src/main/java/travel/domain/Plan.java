@@ -10,7 +10,6 @@ import travel.domain.PlanCreated;
 import travel.domain.PlanDeleted;
 import travel.domain.PlanUpdated;
 import travel.domain.RecommendationCreated;
-import travel.domain.RecommendationRequired;
 
 @Entity
 @Table(name = "Plan_table")
@@ -43,11 +42,6 @@ public class Plan {
         );
         recommendationCreated.publishAfterCommit();
 
-        RecommendationRequired recommendationRequired = new RecommendationRequired(
-            this
-        );
-        recommendationRequired.publishAfterCommit();
-
         PlanCreated planCreated = new PlanCreated(this);
         planCreated.publishAfterCommit();
     }
@@ -70,6 +64,18 @@ public class Plan {
         );
         return planRepository;
     }
+
+    //<<< Clean Arch / Port Method
+    public void requireRecommendation() {
+        //implement business logic here:
+
+        RecommendationRequired recommendationRequired = new RecommendationRequired(
+            this
+        );
+        recommendationRequired.publishAfterCommit();
+    }
+
+    //>>> Clean Arch / Port Method
 
     //<<< Clean Arch / Port Method
     public static void createRecommendation(TokenDecreased tokenDecreased) {
