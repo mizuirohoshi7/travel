@@ -12,6 +12,12 @@ public class PlanHateoasProcessor
 
     @Override
     public EntityModel<Plan> process(EntityModel<Plan> model) {
+        model.add(
+            Link
+                .of(model.getRequiredLink("self").getHref() + "//require")
+                .withRel("/require")
+        );
+
         return model;
     }
 }
