@@ -24,6 +24,7 @@ See the README.md files inside the each microservices directory:
 - member
 - notification
 - follow
+- like
 
 
 ## Run API Gateway (Spring Gateway)
@@ -48,6 +49,9 @@ mvn spring-boot:run
 - follow
 ```
  http :8088/follows id="id" fromId="fromId" toId="toId" 
+```
+- like
+```
 ```
 
 

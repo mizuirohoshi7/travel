@@ -18,6 +18,7 @@ import FollowFollowManager from "./components/listers/FollowFollowCards"
 import FollowFollowDetail from "./components/listers/FollowFollowDetail"
 
 
+
 export default new Router({
     // mode: 'history',
     base: process.env.BASE_URL,
@@ -65,6 +66,7 @@ export default new Router({
                 name: 'FollowFollowDetail',
                 component: FollowFollowDetail
             },
+
 
 
 

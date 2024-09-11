@@ -91,6 +91,34 @@ public class Notification {
         */
 
     }
+
+    //>>> Clean Arch / Port Method
+    //<<< Clean Arch / Port Method
+    public static void createNotification(LikeCreated likeCreated) {
+        //implement business logic here:
+
+        /** Example 1:  new item 
+        Notification notification = new Notification();
+        repository().save(notification);
+
+        NotificationCreated notificationCreated = new NotificationCreated(notification);
+        notificationCreated.publishAfterCommit();
+        */
+
+        /** Example 2:  finding and process
+        
+        repository().findById(likeCreated.get???()).ifPresent(notification->{
+            
+            notification // do something
+            repository().save(notification);
+
+            NotificationCreated notificationCreated = new NotificationCreated(notification);
+            notificationCreated.publishAfterCommit();
+
+         });
+        */
+
+    }
     //>>> Clean Arch / Port Method
 
 }

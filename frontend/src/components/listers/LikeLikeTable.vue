@@ -31,7 +31,7 @@
                         </v-fab-transition>
                     </template>
 
-                    <NotificationNotification :offline="offline" class="video-card" :isNew="true" :editMode="true" v-model="newValue" @add="append" v-if="tick"/>
+                    <LikeLike :offline="offline" class="video-card" :isNew="true" :editMode="true" v-model="newValue" @add="append" v-if="tick"/>
                 
                     <v-btn
                             style="postition:absolute; top:2%; right:2%"
@@ -50,12 +50,12 @@
 
 <script>
     const axios = require('axios').default;
-    import NotificationNotification from './../NotificationNotification.vue';
+    import LikeLike from './../LikeLike.vue';
 
     export default {
-        name: 'NotificationNotificationManager',
+        name: 'LikeLikeManager',
         components: {
-            NotificationNotification,
+            LikeLike,
         },
         props: {
             offline: Boolean,
@@ -68,10 +68,10 @@
                 [
                     { text: "id", value: "id" },
                     { text: "memberId", value: "memberId" },
-                    { text: "details", value: "details" },
-                    { text: "createdAt", value: "createdAt" },
+                    { text: "planId", value: "planId" },
+                    { text: "planOwnerId", value: "planOwnerId" },
                 ],
-            notification : [],
+            like : [],
             newValue: {},
             tick : true,
             openDialog : false,
@@ -82,14 +82,14 @@
                 return;
             }
 
-            var temp = await axios.get(axios.fixUrl('/notifications'))
-            temp.data._embedded.notifications.map(obj => obj.id=obj._links.self.href.split("/")[obj._links.self.href.split("/").length - 1])
-            this.values = temp.data._embedded.notifications;
+            var temp = await axios.get(axios.fixUrl('/likes'))
+            temp.data._embedded.likes.map(obj => obj.id=obj._links.self.href.split("/")[obj._links.self.href.split("/").length - 1])
+            this.values = temp.data._embedded.likes;
 
             this.newValue = {
                 'memberId': 0,
-                'details': '',
-                'createdAt': '2024-09-11',
+                'planId': 0,
+                'planOwnerId': 0,
             }
         },
         methods: {

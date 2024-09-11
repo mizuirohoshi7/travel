@@ -13,7 +13,7 @@
                         class="border-color"
                     >
                     </v-list-item-avatar>
-                    <h1 class="align-self-center ml-3">Plan</h1>
+                    <h1 class="align-self-center ml-3">Like</h1>
                     <div class="secondary-text-color" style="margin-left:30px;"></div>
                 </v-list-item>
             </v-row>
@@ -27,7 +27,7 @@
                         hide-overlay
                         transition="dialog-bottom-transition"
                 >
-                    <PlanPlan :offline="offline" class="video-card" :isNew="true" :editMode="true" v-model="newValue" 
+                    <LikeLike :offline="offline" class="video-card" :isNew="true" :editMode="true" v-model="newValue" 
                             @add="append" v-if="tick"/>
 
                     <v-btn
@@ -66,7 +66,7 @@
                                 color="primary"
                                 style="font-weight:500; font-size:20px; padding:15px; border:solid 2px; max-width:250px; overflow:hidden"
                             >
-                                Plan 등록
+                                Like 등록
                             </v-btn>
                         </v-card-actions>
                     </v-card>
@@ -74,7 +74,7 @@
             </div>
         </v-col>
         <v-row>
-            <PlanPlan :offline="offline" class="video-card" v-for="(value, index) in values" v-model="values[index]" v-bind:key="index" @delete="remove"/>
+            <LikeLike :offline="offline" class="video-card" v-for="(value, index) in values" v-model="values[index]" v-bind:key="index" @delete="remove"/>
         </v-row>
     </div>
 </template>
@@ -82,12 +82,12 @@
 <script>
 
     const axios = require('axios').default;
-    import PlanPlan from './../PlanPlan.vue';
+    import LikeLike from './../LikeLike.vue';
 
     export default {
-        name: 'PlanPlanManager',
+        name: 'LikeLikeManager',
         components: {
-            PlanPlan,
+            LikeLike,
         },
         props: {
             offline: Boolean
@@ -105,17 +105,13 @@
                 return;
             } 
 
-            var temp = await axios.get(axios.fixUrl('/plans'))
-            me.values = temp.data._embedded.plans;
+            var temp = await axios.get(axios.fixUrl('/likes'))
+            me.values = temp.data._embedded.likes;
             
             me.newValue = {
                 'memberId': 0,
-                'location': '',
-                'travelDate': '2024-09-11',
-                'budget': 0,
-                'groupSize': 0,
-                'details': '',
-                'aiRecommendation': '',
+                'planId': 0,
+                'planOwnerId': 0,
             }
         },
         methods:{
