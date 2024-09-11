@@ -10,4 +10,7 @@ import travel.domain.*;
     path = "followModels"
 )
 public interface FollowModelRepository
-    extends PagingAndSortingRepository<FollowModel, Long> {}
+    extends PagingAndSortingRepository<FollowModel, Long> {
+    
+    List<FollowModel> findByToId(Long toId);
+}

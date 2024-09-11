@@ -7,6 +7,8 @@ import javax.persistence.*;
 import lombok.Data;
 import travel.NotificationApplication;
 import travel.domain.NotificationCreated;
+import travel.infra.FollowModelRepository;
+import travel.infra.MemberModelRepository;
 
 @Entity
 @Table(name = "Notification_table")
@@ -41,7 +43,7 @@ public class Notification {
     public static void createNotification(FollowCreated followCreated) {
         Notification notification = new Notification();
         notification.setMemberId(followCreated.getToId());
-        notification.setDetails(followCreated.getFromId() + "님이 " + followCreated.getToId() + "님을 팔로우했습니다.");
+        notification.setDetails(toMemberName(followCreated.getFromId()) + "님이 " + toMemberName(followCreated.getToId()) + "님을 팔로우했습니다.");
         notification.setCreatedAt(new Date());
 
         repository().save(notification);
@@ -51,15 +53,22 @@ public class Notification {
     //>>> Clean Arch / Port Method
     //<<< Clean Arch / Port Method
     public static void createNotification(PlanCreated planCreated) {
-        Notification notification = new Notification();
-
         Long planOwnerId = planCreated.getMemberId();
+        
+        // 계획 생성자의 팔로워 목록 조회
+        FollowModelRepository followModelRepository = NotificationApplication.applicationContext.getBean(
+            FollowModelRepository.class
+        );
+        List<FollowModel> followers = followModelRepository.findByToId(planOwnerId);
+        
+        for (FollowModel follower : followers) {
+            Notification notification = new Notification();
+            notification.setMemberId(follower.getFromId());
+            notification.setDetails(toMemberName(planCreated.getMemberId()) + "님이 새로운 여행 계획을 생성했습니다: " + planCreated.getLocation());
+            notification.setCreatedAt(new Date());
 
-        // notification.setMemberId();
-        notification.setDetails(planCreated.getMemberId() + "님이 새로운 여행 계획을 생성했습니다: " + planCreated.getLocation());
-        notification.setCreatedAt(new Date());
-
-        repository().save(notification);
+            repository().save(notification);
+        }
     }
 
     //>>> Clean Arch / Port Method
@@ -67,12 +76,19 @@ public class Notification {
     public static void createNotification(LikeCreated likeCreated) {
         Notification notification = new Notification();
         notification.setMemberId(likeCreated.getPlanOwnerId());
-        notification.setDetails(likeCreated.getMemberId() + "님이 " + likeCreated.getPlanId() + "번 게시글에 좋아요를 눌렀습니다.");
+        notification.setDetails(toMemberName(likeCreated.getMemberId()) + "님이 " + likeCreated.getPlanId() + "번 게시글에 좋아요를 눌렀습니다.");
         notification.setCreatedAt(new Date());
 
         repository().save(notification);
     }
     //>>> Clean Arch / Port Method
+
+    private static String toMemberName(Long MemberId) {
+        MemberModelRepository memberModelRepository = NotificationApplication.applicationContext.getBean(
+            MemberModelRepository.class
+        );
+        return memberModelRepository.findById(MemberId).get().getName();
+    }
 
 }
 //>>> DDD / Aggregate Root
