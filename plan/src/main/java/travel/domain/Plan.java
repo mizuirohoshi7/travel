@@ -1,45 +1,33 @@
 package travel.domain;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import javax.persistence.*;
 import lombok.Data;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
 import travel.PlanApplication;
-import travel.domain.PlanCreated;
-import travel.domain.PlanDeleted;
-import travel.domain.PlanUpdated;
-import travel.domain.RecommendationCreated;
 
 @Entity
 @Table(name = "Plan_table")
 @Data
-//<<< DDD / Aggregate Root
 public class Plan {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     private Long memberId;
-
     private String location;
-
     private Date travelDate;
-
     private Integer budget;
-
     private Integer groupSize;
-
     private String details;
-
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String aiRecommendation;
 
     @PostPersist
     public void onPostPersist() {
-        RecommendationCreated recommendationCreated = new RecommendationCreated(
-            this
-        );
+        RecommendationCreated recommendationCreated = new RecommendationCreated(this);
         recommendationCreated.publishAfterCommit();
 
         PlanCreated planCreated = new PlanCreated(this);
@@ -59,51 +47,87 @@ public class Plan {
     }
 
     public static PlanRepository repository() {
-        PlanRepository planRepository = PlanApplication.applicationContext.getBean(
-            PlanRepository.class
-        );
-        return planRepository;
+        return PlanApplication.applicationContext.getBean(PlanRepository.class);
     }
 
-    //<<< Clean Arch / Port Method
     public void requireRecommendation() {
-        //implement business logic here:
-
-        RecommendationRequired recommendationRequired = new RecommendationRequired(
-            this
-        );
+        RecommendationRequired recommendationRequired = new RecommendationRequired(this);
         recommendationRequired.publishAfterCommit();
     }
 
-    //>>> Clean Arch / Port Method
-
-    //<<< Clean Arch / Port Method
     public static void createRecommendation(TokenDecreased tokenDecreased) {
-        //implement business logic here:
+        Plan plan = repository().findByMemberId(tokenDecreased.getId());
+        if (plan == null) {
+            System.out.println("[오류] Plan not found for member id: " + tokenDecreased.getId());
+            return;
+        }
 
-        /** Example 1:  new item 
-        Plan plan = new Plan();
-        repository().save(plan);
+        String openAiToken = "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";
 
-        RecommendationCreated recommendationCreated = new RecommendationCreated(plan);
-        recommendationCreated.publishAfterCommit();
-        */
+        try {
+            String prompt = "당신은 개인 맞춤형 여행 계획 전문가입니다. 다음 정보를 바탕으로 상세한 여행 계획을 제안해주세요:\n" +
+                "위치: " + plan.getLocation() + "\n" +
+                "여행 날짜: " + plan.getTravelDate() + "\n" +
+                "예산: " + plan.getBudget() + "원\n" +
+                "그룹 크기: " + plan.getGroupSize() + "명\n" +
+                "추가 세부사항: " + plan.getDetails() + "\n\n" +
+                "다음 형식으로 응답해주세요:\n" +
+                "1. 여행 개요\n" +
+                "2. 일자별 세부 계획 (각 일자마다):\n" +
+                "   - 추천 활동 및 관광지\n" +
+                "   - 식사 추천\n" +
+                "   - 예상 소요 시간 및 비용\n" +
+                "3. 숙박 추천\n" +
+                "4. 교통 수단 추천\n" +
+                "5. 예산 분배 제안\n" +
+                "6. 현지 문화 및 주의사항 팁\n" +
+                "7. 추가 추천 사항 (선택적 활동, 쇼핑, 등)";
 
-        /** Example 2:  finding and process
-        
-        repository().findById(tokenDecreased.get???()).ifPresent(plan->{
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(openAiToken);
+
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("model", "gpt-3.5-turbo-0125");
+            requestBody.put("messages", Arrays.asList(
+                Map.of("role", "system", "content", "You are a travel planning expert."),
+                Map.of("role", "user", "content", prompt)
+            ));
+            requestBody.put("max_tokens", 1000);
+            requestBody.put("temperature", 0.7);
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+            ResponseEntity<Map> response = restTemplate.postForEntity(
+                "https://api.openai.com/v1/chat/completions",
+                entity,
+                Map.class
+            );
+
+            Map<String, Object> responseBody = response.getBody();
+            List<Map<String, Object>> choices = (List<Map<String, Object>>) responseBody.get("choices");
             
-            plan // do something
+            if (choices.isEmpty()) {
+                throw new IllegalStateException("[오류] API 응답에 선택 항목이 없습니다.");
+            }
+
+            String recommendation = (String) ((Map<String, Object>) choices.get(0).get("message")).get("content");
+            System.out.println("생성된 추천: " + recommendation);
+
+            plan.setAiRecommendation(recommendation.trim());
             repository().save(plan);
 
             RecommendationCreated recommendationCreated = new RecommendationCreated(plan);
             recommendationCreated.publishAfterCommit();
 
-         });
-        */
+            System.out.println("AI 추천이 성공적으로 생성되고 저장되었습니다. Plan ID: " + plan.getId());
 
+        } catch (Exception e) {
+            System.out.println("[오류] AI 추천 생성 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+            plan.setAiRecommendation("죄송합니다. 현재 AI 추천을 생성할 수 없습니다. 나중에 다시 시도해 주세요.");
+            repository().save(plan);
+        }
     }
-    //>>> Clean Arch / Port Method
-
 }
-//>>> DDD / Aggregate Root

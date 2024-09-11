@@ -60,35 +60,21 @@ public class Member {
     public static void decreaseToken(
         RecommendationRequired recommendationRequired
     ) {
-        //implement business logic here:
+        Member member = repository().findById(recommendationRequired.getMemberId()).get();
+        int currentToken = member.getTokenAmount();
+        int requiredToken = 100; // 요구양에 따라 변화 필요
 
-        /** Example 1:  new item 
-        Member member = new Member();
-        repository().save(member);
-
-        TokenDecreased tokenDecreased = new TokenDecreased(member);
-        tokenDecreased.publishAfterCommit();
-        TokenDecreasingFailed tokenDecreasingFailed = new TokenDecreasingFailed(member);
-        tokenDecreasingFailed.publishAfterCommit();
-        */
-
-        /** Example 2:  finding and process
-        
-        repository().findById(recommendationRequired.get???()).ifPresent(member->{
-            
-            member // do something
-            repository().save(member);
-
+        if (currentToken >= requiredToken) {
+            member.setTokenAmount(currentToken - requiredToken);
             TokenDecreased tokenDecreased = new TokenDecreased(member);
             tokenDecreased.publishAfterCommit();
+        } else {
             TokenDecreasingFailed tokenDecreasingFailed = new TokenDecreasingFailed(member);
             tokenDecreasingFailed.publishAfterCommit();
-
-         });
-        */
-
+        }
     }
     //>>> Clean Arch / Port Method
 
 }
 //>>> DDD / Aggregate Root
+
