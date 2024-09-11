@@ -39,59 +39,25 @@ public class Notification {
 
     //<<< Clean Arch / Port Method
     public static void createNotification(FollowCreated followCreated) {
-        //implement business logic here:
-
-        /** Example 1:  new item 
         Notification notification = new Notification();
+        notification.setMemberId(followCreated.getToId());
+        notification.setDetails(followCreated.getFromId() + "님이 " + followCreated.getToId() + "님을 팔로우했습니다.");
+        notification.setCreatedAt(new Date());
+
         repository().save(notification);
-
-        NotificationCreated notificationCreated = new NotificationCreated(notification);
-        notificationCreated.publishAfterCommit();
-        */
-
-        /** Example 2:  finding and process
-        
-        repository().findById(followCreated.get???()).ifPresent(notification->{
-            
-            notification // do something
-            repository().save(notification);
-
-            NotificationCreated notificationCreated = new NotificationCreated(notification);
-            notificationCreated.publishAfterCommit();
-
-         });
-        */
-
     }
 
     //>>> Clean Arch / Port Method
     //<<< Clean Arch / Port Method
     public static void createNotification(PlanCreated planCreated) {
-        //implement business logic here:
-
-        /** Example 1:  new item 
         Notification notification = new Notification();
+        notification.setMemberId(planCreated.getMemberId());
+        notification.setDetails(planCreated.getMemberId() + "님이 새로운 여행 계획을 생성했습니다: " + planCreated.getLocation());
+        notification.setCreatedAt(new Date());
+
         repository().save(notification);
-
-        NotificationCreated notificationCreated = new NotificationCreated(notification);
-        notificationCreated.publishAfterCommit();
-        */
-
-        /** Example 2:  finding and process
-        
-        repository().findById(planCreated.get???()).ifPresent(notification->{
-            
-            notification // do something
-            repository().save(notification);
-
-            NotificationCreated notificationCreated = new NotificationCreated(notification);
-            notificationCreated.publishAfterCommit();
-
-         });
-        */
-
     }
     //>>> Clean Arch / Port Method
-
 }
 //>>> DDD / Aggregate Root
+
