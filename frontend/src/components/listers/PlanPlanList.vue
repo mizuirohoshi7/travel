@@ -128,7 +128,7 @@
             this.newValue = {
                 'memberId': 0,
                 'location': '',
-                'travelDate': '2024-09-06',
+                'travelDate': '2024-09-11',
                 'budget': 0,
                 'groupSize': 0,
                 'details': '',

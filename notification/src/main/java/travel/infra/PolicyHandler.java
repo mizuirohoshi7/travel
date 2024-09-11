@@ -54,5 +54,21 @@ public class PolicyHandler {
         // Sample Logic //
         Notification.createNotification(event);
     }
+
+    @StreamListener(
+        value = KafkaProcessor.INPUT,
+        condition = "headers['type']=='LikeCreated'"
+    )
+    public void wheneverLikeCreated_CreateNotification(
+        @Payload LikeCreated likeCreated
+    ) {
+        LikeCreated event = likeCreated;
+        System.out.println(
+            "\n\n##### listener CreateNotification : " + likeCreated + "\n\n"
+        );
+
+        // Sample Logic //
+        Notification.createNotification(event);
+    }
 }
 //>>> Clean Arch / Inbound Adaptor

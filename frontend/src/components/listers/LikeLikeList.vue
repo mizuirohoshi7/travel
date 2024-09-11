@@ -1,6 +1,6 @@
 <template>
     <div>
-    <h1>Notification</h1>
+    <h1>Like</h1>
         <v-row>
             <v-card
                 class="mx-auto"
@@ -26,7 +26,7 @@
                         color="primary"
                         style="font-weight:500; font-size:20px; padding:15px; border:solid 2px; max-width:250px; overflow:hidden"
                     >
-                        Notification 등록
+                        Like 등록
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -49,8 +49,8 @@
                         <v-list-item-subtitle style="font-size:25px; font-weight:700;">
                             [ Id :  {{data.id }} ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             [ MemberId :  {{data.memberId }} ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            [ Details :  {{data.details }} ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            [ CreatedAt :  {{data.createdAt }} ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            [ PlanId :  {{data.planId }} ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            [ PlanOwnerId :  {{data.planOwnerId }} ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         </v-list-item-subtitle>
 
                     </v-list-item-content>
@@ -70,7 +70,7 @@
                         transition="dialog-bottom-transition"
                 >
 
-                    <NotificationNotification :offline="offline" class="video-card" :isNew="true" :editMode="true" v-model="newValue" @add="append" v-if="tick"/>
+                    <LikeLike :offline="offline" class="video-card" :isNew="true" :editMode="true" v-model="newValue" @add="append" v-if="tick"/>
                 
                     <v-btn
                             style="postition:absolute; top:2%; right:2%"
@@ -89,12 +89,12 @@
 
 <script>
     const axios = require('axios').default;
-    import NotificationNotification from './../NotificationNotification.vue';
+    import LikeLike from './../LikeLike.vue';
 
     export default {
-        name: 'NotificationNotificationManager',
+        name: 'LikeLikeManager',
         components: {
-            NotificationNotification,
+            LikeLike,
         },
         props: {
             offline: Boolean,
@@ -113,14 +113,14 @@
                 return;
             } 
 
-            var temp = await axios.get(axios.fixUrl('/notifications'))
-            temp.data._embedded.notifications.map(obj => obj.id=obj._links.self.href.split("/")[obj._links.self.href.split("/").length - 1])
-            this.values = temp.data._embedded.notifications;
+            var temp = await axios.get(axios.fixUrl('/likes'))
+            temp.data._embedded.likes.map(obj => obj.id=obj._links.self.href.split("/")[obj._links.self.href.split("/").length - 1])
+            this.values = temp.data._embedded.likes;
             
             this.newValue = {
                 'memberId': 0,
-                'details': '',
-                'createdAt': '2024-09-11',
+                'planId': 0,
+                'planOwnerId': 0,
             }
         },
         methods: {

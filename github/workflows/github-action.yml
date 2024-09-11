@@ -33,6 +33,7 @@ jobs:
           mvn clean package -f ./member/pom.xml
           mvn clean package -f ./notification/pom.xml
           mvn clean package -f ./follow/pom.xml
+          mvn clean package -f ./like/pom.xml
 
       - name: Docker Build and push for Plan
         uses: docker/build-push-action@v4
@@ -73,4 +74,14 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}/follow:latest
             ghcr.io/${{ github.repository }}/follow:${{ github.ref_name }}
+            
+      - name: Docker Build and push for Like
+        uses: docker/build-push-action@v4
+        with:
+          context: ./like
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/like:latest
+            ghcr.io/${{ github.repository }}/like:${{ github.ref_name }}
             
