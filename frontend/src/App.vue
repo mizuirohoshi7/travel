@@ -1,53 +1,28 @@
 <template>
-    <v-app id="inspire">
-        <SNSApp />
-    </v-app>
-</template>
-
-<script>
-import SNSApp from './SNSApp.vue'
-
-export default {
-
-    components: {
-        SNSApp
-    },
-    name: "App",
-    data: () => ({
-        useComponent: "",
-        drawer: true,
-        components: [],
-        sideBar: true,
-        urlPath: null,
-    }),
-    
-    async created() {
-      var path = document.location.href.split("#/")
-      this.urlPath = path[1];
-
-    },
-
-    mounted() {
-        var me = this;
-        me.components = this.$ManagerLists;
-    },
-
-    methods: {
-        openSideBar(){
-            this.sideBar = !this.sideBar
-        },
-        changeUrl() {
-            var path = document.location.href.split("#/")
-            this.urlPath = path[1];
-        },
-        goHome() {
-            this.urlPath = null;
-        },
-    }
-};
-</script>
-<style>
-*{
-    font-family:  !important;
-}
-</style>
+    <div id="app">
+      <router-view />  <!-- router-view를 통해 현재 라우터에 맞는 컴포넌트를 표시합니다 -->
+    </div>
+  </template>
+  
+  <script>
+  export default {
+    name: 'App',
+  };
+  </script>
+  
+  <style>
+  /* 전역 스타일 설정 */
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+  }
+  
+  #app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  </style>
+  
