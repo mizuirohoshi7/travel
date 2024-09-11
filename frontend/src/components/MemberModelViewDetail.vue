@@ -7,7 +7,16 @@
 
         <v-card-text>
             <div>
+                <String label="OauthId" v-model="item.oauthId" :editMode="editMode" @change="change" />
+            </div>
+            <div>
                 <String label="Name" v-model="item.name" :editMode="editMode" @change="change" />
+            </div>
+            <div>
+                <String label="Email" v-model="item.email" :editMode="editMode" @change="change" />
+            </div>
+            <div>
+                <Number label="TokenAmount" v-model="item.tokenAmount" :editMode="editMode" @change="change" />
             </div>
         </v-card-text>
     </v-card>

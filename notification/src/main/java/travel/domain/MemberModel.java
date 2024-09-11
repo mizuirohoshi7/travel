@@ -16,5 +16,8 @@ public class MemberModel {
     //@GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
+    private String oauthId;
     private String name;
+    private String email;
+    private Integer tokenAmount;
 }

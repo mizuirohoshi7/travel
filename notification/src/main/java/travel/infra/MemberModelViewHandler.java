@@ -29,6 +29,9 @@ public class MemberModelViewHandler {
             // view 객체에 이벤트의 Value 를 set 함
             memberModel.setId(memberCreated.getId());
             memberModel.setName(memberCreated.getName());
+            memberModel.setOauthId(memberCreated.getOauthId());
+            memberModel.setEmail(memberCreated.getEmail());
+            memberModel.setTokenAmount(memberCreated.getTokenAmount());
             // view 레파지 토리에 save
             memberModelRepository.save(memberModel);
         } catch (Exception e) {

@@ -22,7 +22,10 @@
         data: () => ({
             headers: [
                 { text: "id", value: "id" },
+                { text: "oauthId", value: "oauthId" },
                 { text: "name", value: "name" },
+                { text: "email", value: "email" },
+                { text: "tokenAmount", value: "tokenAmount" },
             ],
             memberModel : [],
         }),
