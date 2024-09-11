@@ -8,16 +8,14 @@ import lombok.Data;
 
 //<<< EDA / CQRS
 @Entity
-@Table(name = "MemberModel_table")
+@Table(name = "FollowModel_table")
 @Data
-public class MemberModel {
+public class FollowModel {
 
     @Id
     //@GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
-    private String oauthId;
-    private String name;
-    private String email;
-    private Integer tokenAmount;
+    private Long fromId;
+    private Long toId;
 }
