@@ -1,8 +1,6 @@
 package travel.domain;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import javax.persistence.*;
 import lombok.Data;
 import travel.NotificationApplication;
@@ -13,7 +11,6 @@ import travel.infra.MemberModelRepository;
 @Entity
 @Table(name = "Notification_table")
 @Data
-//<<< DDD / Aggregate Root
 public class Notification {
 
     @Id
@@ -39,7 +36,6 @@ public class Notification {
         return notificationRepository;
     }
 
-    //<<< Clean Arch / Port Method
     public static void createNotification(FollowCreated followCreated) {
         Notification notification = new Notification();
         notification.setMemberId(followCreated.getToId());
@@ -47,15 +43,11 @@ public class Notification {
         notification.setCreatedAt(new Date());
 
         repository().save(notification);
-
     }
 
-    //>>> Clean Arch / Port Method
-    //<<< Clean Arch / Port Method
     public static void createNotification(PlanCreated planCreated) {
         Long planOwnerId = planCreated.getMemberId();
         
-        // 계획 생성자의 팔로워 목록 조회
         FollowModelRepository followModelRepository = NotificationApplication.applicationContext.getBean(
             FollowModelRepository.class
         );
@@ -71,24 +63,19 @@ public class Notification {
         }
     }
 
-    //>>> Clean Arch / Port Method
-    //<<< Clean Arch / Port Method
     public static void createNotification(LikeCreated likeCreated) {
         Notification notification = new Notification();
         notification.setMemberId(likeCreated.getPlanOwnerId());
         notification.setDetails(toMemberName(likeCreated.getMemberId()) + "님이 " + likeCreated.getPlanId() + "번 게시글에 좋아요를 눌렀습니다.");
         notification.setCreatedAt(new Date());
-
+        
         repository().save(notification);
     }
-    //>>> Clean Arch / Port Method
 
-    private static String toMemberName(Long MemberId) {
-        MemberModelRepository memberModelRepository = NotificationApplication.applicationContext.getBean(
-            MemberModelRepository.class
-        );
-        return memberModelRepository.findById(MemberId).get().getName();
+    private static String toMemberName(Long memberId) {
+        MemberModelRepository memberModelRepository = NotificationApplication.applicationContext.getBean(MemberModelRepository.class);
+        return memberModelRepository.findById(memberId)
+            .map(MemberModel::getName)
+            .orElseThrow(() -> new RuntimeException("Member not found with id: " + memberId));
     }
-
 }
-//>>> DDD / Aggregate Root

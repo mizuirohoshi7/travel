@@ -25,6 +25,8 @@ public class Plan {
     @Column(columnDefinition = "TEXT")
     private String aiRecommendation;
 
+    private static Long lastRequestedPlanId;
+
     @PostPersist
     public void onPostPersist() {
         RecommendationCreated recommendationCreated = new RecommendationCreated(this);
@@ -53,16 +55,25 @@ public class Plan {
     public void requireRecommendation() {
         RecommendationRequired recommendationRequired = new RecommendationRequired(this);
         recommendationRequired.publishAfterCommit();
+
+        // 현재 Plan의 ID를 임시 저장
+        lastRequestedPlanId = this.getId();
     }
 
     public static void createRecommendation(TokenDecreased tokenDecreased) {
-        Plan plan = repository().findByMemberId(tokenDecreased.getId());
-        if (plan == null) {
-            System.out.println("[오류] Plan not found for member id: " + tokenDecreased.getId());
+        if (lastRequestedPlanId == null) {
+            System.out.println("[오류] 최근 요청된 Plan ID를 찾을 수 없습니다.");
             return;
         }
 
-        String openAiToken = "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";
+        Optional<Plan> planOptional = repository().findById(lastRequestedPlanId);
+        if (!planOptional.isPresent()) {
+            System.out.println("[오류] Plan을 찾을 수 없습니다. Plan ID: " + lastRequestedPlanId);
+            return;
+        }
+        Plan plan = planOptional.get();
+
+        String openAiToken = "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";
 
         try {
             String prompt = "당신은 개인 맞춤형 여행 계획 전문가입니다. 다음 정보를 바탕으로 상세한 여행 계획을 제안해주세요:\n" +
@@ -122,12 +133,14 @@ public class Plan {
             recommendationCreated.publishAfterCommit();
 
             System.out.println("AI 추천이 성공적으로 생성되고 저장되었습니다. Plan ID: " + plan.getId());
+            lastRequestedPlanId = null;
 
         } catch (Exception e) {
             System.out.println("[오류] AI 추천 생성 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
             plan.setAiRecommendation("죄송합니다. 현재 AI 추천을 생성할 수 없습니다. 나중에 다시 시도해 주세요.");
             repository().save(plan);
+            lastRequestedPlanId = null;
         }
     }
 }

@@ -23,6 +23,18 @@ public class Like {
 
     private Long planOwnerId;
 
+    @PostPersist
+    public void onPostPersist() {
+        LikeCreated likeCreated = new LikeCreated(this);
+        likeCreated.publishAfterCommit();
+    }
+
+    @PreRemove
+    public void onPreRemove() {
+        LikeDeleted likeDeleted = new LikeDeleted(this);
+        likeDeleted.publishAfterCommit();
+    }
+
     public static LikeRepository repository() {
         LikeRepository likeRepository = LikeApplication.applicationContext.getBean(
             LikeRepository.class
