@@ -3,8 +3,8 @@
     
     <h1>Kt-ravel Login</h1>
     <div class="login-buttons">
-      <button class="naver-btn" @click="loginWithNaver">네이버 로그인</button>
-      <button class="google-btn" @click="loginWithGoogle">구글 로그인</button>
+      <img src="@/assets/naver.png" alt="Naver Login" class="login-img" @click="loginWithNaver" />
+      <img src="@/assets/google.png" alt="Google Login" class="login-img" @click="loginWithGoogle" />
     </div>
   </div>
 </template>
@@ -30,11 +30,6 @@ export default {
   margin-top: 50px;
 }
 
-.logo {
-  width: 200px;
-  margin-bottom: 30px;
-}
-
 h1 {
   font-size: 24px;
   margin-bottom: 20px;
@@ -46,23 +41,12 @@ h1 {
   gap: 20px;
 }
 
-.naver-btn, .google-btn {
+.login-img {
   width: 150px;
-  padding: 15px;
-  border: none;
-  border-radius: 5px;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
 }
 
-.naver-btn {
-  background-color: #1ec800;
-  color: white;
-}
-
-.google-btn {
-  background-color: #4285f4;
-  color: white;
+.login-img:hover {
+  opacity: 0.8;
 }
 </style>
