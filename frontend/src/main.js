@@ -4,7 +4,7 @@ import router from './router';
 import axios from 'axios';
 
 // axios 기본 설정
-axios.defaults.baseURL = 'http://localhost:8088'; // Spring Gateway 서버 주소
+axios.defaults.baseURL = null; // Spring Gateway 서버 주소
 axios.defaults.withCredentials = true;
 
 // axios를 Vue 인스턴스에 추가

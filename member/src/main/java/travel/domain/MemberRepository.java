@@ -7,4 +7,6 @@ import travel.domain.*;
 //<<< PoEAA / Repository
 @RepositoryRestResource(collectionResourceRel = "members", path = "members")
 public interface MemberRepository
-    extends PagingAndSortingRepository<Member, Long> {}
+    extends PagingAndSortingRepository<Member, Long> {
+        Member findByEmail(String email);
+    }

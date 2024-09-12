@@ -1,436 +1,298 @@
 <template>
   <div class="plan-management">
-    <h1>Your plans</h1>
-
-    <!-- Tabs for plan categories -->
-    <div class="tabs">
-      <button :class="{ active: activeTab === 'upcoming' }" @click="activeTab = 'upcoming'">Upcoming</button>
-      <button :class="{ active: activeTab === 'saved' }" @click="activeTab = 'saved'">Saved</button>
-      <button :class="{ active: activeTab === 'past' }" @click="activeTab = 'past'">Past</button>
-    </div>
-
-    <!-- Plan list -->
-    <div class="plan-list">
-      <div v-for="(plan, index) in filteredPlans" :key="index" class="plan-item" @click="viewItinerary(plan)">
-        <img :src="plan.image" alt="plan image" class="plan-image" />
-        <div class="plan-details">
-          <h3>{{ plan.name }}</h3>
-          <p>{{ plan.date }}</p>
+    <div class="header">
+      <!-- 홈 버튼 및 여행 계획 아이콘 -->
+      <div class="icons">
+        <div class="icon-button" @click="goToMainPage">
+          <img src="@/assets/home.png" alt="Home" class="icon home-btn" />
+          <p>Home</p>
         </div>
-        <button class="edit-btn" @click.stop="openModal(plan)">
-          <i class="fas fa-edit"></i> Edit
-        </button>
-        <button class="ai-btn" @click.stop="getAISuggestion(plan)">
-          <i class="fas fa-lightbulb"></i> AI 추천
-        </button>
-      </div>
-    </div>
-
-    <!-- Add new plan button -->
-    <div class="add-plan">
-      <button @click="createPlan">
-        <i class="fas fa-plus"></i> Add a plan
-      </button>
-    </div>
-
-    <!-- Edit Modal -->
-    <div v-if="showModal" class="modal-overlay" @click="closeModal">
-      <div class="modal-content" @click.stop>
-        <h2>Edit Plan</h2>
-        <form @submit.prevent="updatePlan">
-          <div class="form-group">
-            <label for="destination">Destination</label>
-            <input v-model="selectedPlan.destination" type="text" id="destination" required />
-          </div>
-
-          <div class="form-group">
-            <label for="people">Number of people</label>
-            <input v-model.number="selectedPlan.people" type="number" id="people" required />
-          </div>
-
-          <div class="form-group">
-            <label for="budget">Budget</label>
-            <input v-model.number="selectedPlan.budget" type="number" id="budget" required />
-          </div>
-
-          <div class="form-group">
-            <label for="start-date">Start date</label>
-            <input v-model="selectedPlan.startDate" type="date" id="start-date" required />
-          </div>
-
-          <div class="form-group">
-            <label for="end-date">End date</label>
-            <input v-model="selectedPlan.endDate" type="date" id="end-date" required />
-          </div>
-
-          <div class="form-group">
-            <label for="notes">Notes</label>
-            <textarea v-model="selectedPlan.notes" id="notes"></textarea>
-          </div>
-
-          <div class="modal-actions">
-            <button type="submit" class="save-btn">Save</button>
-            <button type="button" class="delete-btn" @click="deletePlan">Delete</button>
-          </div>
-        </form>
-        <button class="close-btn" @click="closeModal">Close</button>
-      </div>
-    </div>
-
-    <!-- Itinerary View -->
-    <div v-if="showItinerary" class="itinerary-overlay" @click="closeItinerary">
-      <div class="itinerary-content" @click.stop>
-        <h2>{{ selectedPlan.name }}'s Itinerary</h2>
-        <div v-for="(day, index) in selectedPlan.itinerary" :key="index">
-          <h3>Day {{ index + 1 }}</h3>
-          <p>{{ day }}</p>
+        <div class="icon-button" @click="goToCreatePlan">
+          <img src="@/assets/plan.png" alt="Plan" class="icon plan-btn" />
+          <p>Plan</p> 
         </div>
-        <button class="close-btn" @click="closeItinerary">Close</button>
       </div>
+      <h1>My trip plans</h1>
     </div>
+
+    <ul v-if="plans.length" class="plan-list">
+      <li v-for="plan in plans" :key="plan.id" class="plan-item">
+        <div class="plan-overview">
+          <h2>{{ plan.location }} 여행</h2>
+          <p class="plan-date">날짜: {{ formatDate(plan.travelDate) }}</p>
+          <p>예산: {{ plan.budget }}원</p>
+          <p>인원: {{ plan.groupSize }}명</p>
+        </div>
+        <div class="button-group">
+          <button @click="goToEditPlan(plan)" class="edit-btn">수정</button>
+          <button @click="deletePlan(plan)" class="delete-btn">삭제</button>
+          <button @click="requestAiRecommendation(plan)" class="ai-btn">AI 추천 받기</button>
+          <button @click="showDetails(plan)" class="details-btn">상세 보기</button>
+        </div>
+      </li>
+    </ul>
+
+    <p v-else>현재 등록된 여행 계획이 없습니다. 새로운 계획을 추가해보세요!</p>
+
+    <transition name="fade">
+      <div v-if="selectedPlan" class="plan-details">
+        <h2>{{ selectedPlan.location }} 여행 상세 정보</h2>
+        <p>날짜: {{ formatDate(selectedPlan.travelDate) }}</p>
+        <p>예산: {{ selectedPlan.budget }}원</p>
+        <p>인원: {{ selectedPlan.groupSize }}명</p>
+        <p>세부사항: {{ selectedPlan.details }}</p>
+        <h3>AI 추천:</h3>
+        <!-- vue-markdown 컴포넌트를 사용하여 마크다운을 렌더링 -->
+        <vue-markdown v-if="selectedPlan.aiRecommendation">
+          {{ selectedPlan.aiRecommendation }}
+        </vue-markdown>
+        <p v-else>아직 AI 추천이 없습니다.</p>
+        <button @click="selectedPlan = null" class="close-btn">닫기</button>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script>
-import planService from '@/services/planService';
+import axios from 'axios';
+import VueMarkdown from 'vue-markdown'; // vue-markdown 불러오기
 
 export default {
+  name: 'PlanManagement',
+  components: {
+    VueMarkdown, // 컴포넌트 등록
+  },
   data() {
     return {
-      activeTab: 'upcoming',
-      plans: [
-        { id: 1, name: 'Hawaii: 2022', date: 'July 1-5', image: '/assets/plan1.svg', category: 'upcoming', itinerary: ['Day 1: Arrival', 'Day 2: Beach', 'Day 3: Hiking'] },
-        { id: 2, name: 'San Francisco: 2022', date: 'June 1-5', image: '/assets/images/plan2.png', category: 'upcoming', itinerary: ['Day 1: Golden Gate', 'Day 2: Alcatraz'] },
-        { id: 3, name: 'Paris: 2022', date: 'May 1-5', image: '/assets/images/images/plan3.png', category: 'upcoming', itinerary: ['Day 1: Eiffel Tower', 'Day 2: Louvre'] },
-        { id: 4, name: 'New York: 2022', date: 'April 1-5', image: '/assets/images/plan4.png', category: 'upcoming', itinerary: ['Day 1: Times Square', 'Day 2: Central Park'] },
-        { id: 5, name: 'Tokyo: 2021', date: 'August 1-5', image: '/assets/images/plan5.jpg', category: 'past', itinerary: ['Day 1: Shibuya', 'Day 2: Asakusa'] },
-      ],
-      showModal: false,
+      plans: [],
       selectedPlan: null,
-      showItinerary: false,
     };
   },
-  computed: {
-    filteredPlans() {
-      return this.plans.filter(plan => plan.category === this.activeTab);
-    },
+  created() {
+    this.fetchPlans();
   },
   methods: {
-    createPlan() {
-      // CreatePlan 페이지로 이동
-      this.$router.push({ name: 'CreatePlan' });
-    },
-    openModal(plan) {
-      this.selectedPlan = { ...plan };
-      this.showModal = true;
-    },
-    closeModal() {
-      this.showModal = false;
-      this.selectedPlan = null;
-    },
-    updatePlan() {
-      alert('Plan updated successfully!');
-      this.closeModal();
-    },
-    deletePlan() {
-      if (confirm('Are you sure you want to delete this plan?')) {
-        this.plans = this.plans.filter(p => p.id !== this.selectedPlan.id);
-        this.closeModal();
+    async fetchPlans() {
+      try {
+        const response = await axios.get('/plans');
+        this.plans = response.data._embedded.plans.map(plan => ({
+          ...plan,
+          id: plan._links.self.href.split('/').pop()
+        }));
+      } catch (error) {
+        console.error('계획을 가져오는 중 오류 발생:', error);
+        alert('계획 목록을 불러오는 데 실패했습니다.');
       }
     },
-    getAISuggestion(plan) {
-      // AI 추천을 통해 여행 계획을 생성하고 itinerary에 저장
-      const aiSuggestedItinerary = [
-        'Day 1: Local Sightseeing',
-        'Day 2: Explore Cultural Spots',
-        'Day 3: Visit Popular Landmarks'
-      ];
-
-      plan.itinerary = aiSuggestedItinerary;
-      alert(`AI 추천 여행 일정이 ${plan.name}에 저장되었습니다!`);
+    formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString();
     },
-    viewItinerary(plan) {
-      this.selectedPlan = { ...plan };
-      this.showItinerary = true;
+    showDetails(plan) {
+      this.selectedPlan = plan;
     },
-    closeItinerary() {
-      this.showItinerary = false;
-      this.selectedPlan = null;
+    goToCreatePlan() {
+      this.$router.push({ name: 'CreatePlan' });
     },
-    // CreatePlan에서 새 계획 받아오는 메서드
-    addNewPlan(plan) {
-      this.plans.push(plan);
-    }
-  },
-  mounted() {
-    // CreatePlan에서 새 계획이 넘어온 경우 처리
-    if (this.$route.query.newPlan) {
-      const newPlan = JSON.parse(this.$route.query.newPlan);
-      this.addNewPlan(newPlan);  // 새로운 계획을 추가
+    goToMainPage() {
+      this.$router.push({ name: 'MainPage' });
+    },
+    goToEditPlan(plan) {
+      if (!plan.id) {
+        alert('수정할 수 없는 계획입니다. 유효하지 않은 ID입니다.');
+        return;
+      }
+      this.$router.push({ name: 'EditPlan', params: { id: plan.id }, query: { plan: JSON.stringify(plan) } });
+    },
+    async deletePlan(plan) {
+      if (confirm('정말로 이 계획을 삭제하시겠습니까?')) {
+        try {
+          await axios.delete(`/plans/${plan.id}`);
+          this.plans = this.plans.filter(p => p.id !== plan.id);
+          alert('계획이 성공적으로 삭제되었습니다.');
+        } catch (error) {
+          console.error('계획 삭제 중 오류 발생:', error);
+          alert('계획 삭제에 실패했습니다.');
+        }
+      }
+    },
+    async requestAiRecommendation(plan) {
+      try {
+        const response = await axios.put(`/plans/${plan.id}/require`);
+        if (response.status === 200) {
+          alert('AI 추천이 요청되었습니다. 잠시 후 다시 확인해주세요.');
+          await this.fetchPlan(plan.id);
+        } else {
+          alert('AI 추천 요청에 실패했습니다. 다시 시도해주세요.');
+        }
+      } catch (error) {
+        console.error('AI 추천 요청 중 오류 발생:', error);
+        alert('AI 추천 요청에 실패했습니다.');
+      }
+    },
+    async fetchPlan(planId) {
+      try {
+        const response = await axios.get(`/plans/${planId}`);
+        const updatedPlan = {
+          ...response.data,
+          id: planId
+        };
+        const index = this.plans.findIndex(p => p.id === planId);
+        if (index !== -1) {
+          this.plans.splice(index, 1, updatedPlan);
+        }
+        if (this.selectedPlan && this.selectedPlan.id === planId) {
+          this.selectedPlan = updatedPlan;
+        }
+      } catch (error) {
+        console.error('개별 plan 가져오기 중 오류 발생:', error);
+        alert('계획 정보를 업데이트하는 데 실패했습니다.');
+      }
     }
   }
 };
 </script>
 
-
 <style scoped>
-/* Global Styles */
-body {
-  background-color: #e0f7fa;
-  font-family: 'Roboto', sans-serif;
+.plan-management {
+  font-family: 'Poppins', sans-serif;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px;
+  background: linear-gradient(135deg, #f0f9ff, #c2e9fb);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.plan-management {
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
-  background-color: white;
-  border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  text-align: center;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.icons {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.icon-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.icon-button:hover {
+  transform: scale(1.05);
+}
+
+.icon {
+  width: 50px; /* 아이콘 크기 설정 */
+  height: 50px;
+  margin-bottom: 8px;
+}
+
+.icon-button p {
+  font-size: 14px;
+  color: #333;
+  margin: 0;
 }
 
 h1 {
-  font-size: 32px;
-  color: #00796b;
-  margin-bottom: 20px;
-}
-
-/* Tabs */
-.tabs {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.tabs button {
-  padding: 12px 24px;
-  background-color: transparent;
-  border: none;
-  color: #00838f;
-  font-size: 18px;
-  cursor: pointer;
-  border-bottom: 3px solid transparent;
-  transition: border-bottom 0.3s ease, color 0.3s ease;
-}
-
-.tabs button.active {
-  border-bottom: 3px solid #00796b;
-  color: #00796b;
-}
-
-/* Plan List */
-.plan-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.plan-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* 추가: 양쪽 끝으로 요소 배치 */
-  padding: 15px;
-  background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
-  cursor: pointer;
-}
-.plan-item:hover {
-  transform: translateY(-5px);
-}
-
-.plan-image {
-  width: 100px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-right: 20px;
-}
-
-.plan-details h3 {
-  margin: 0;
-  font-size: 20px;
-  color: #00796b;
-}
-
-.plan-details p {
-  margin-top: 5px;
-  font-size: 16px;
-  color: #1c0244;
-}
-
-/* Buttons */
-.edit-btn,
-.ai-btn {
-  background-color: #24559e;
-  color: white;
-  border: none;
-  padding: 9px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
-}
-/* 두 버튼 사이에 10cm (약 377px)의 간격을 추가 */
-.edit-btn {
-  margin-right: 2px; /* 버튼 사이 간격 */
-}
-
-.plan-buttons {
-  display: flex;
-  margin-left: auto; /* 버튼들이 오른쪽 끝으로 이동 */
-}
-
-.add-plan button {
-  background-color: #24559e;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
-}
-
-.add-plan button {
-  background-color: #1f1c60;
-}
-
-.ai-btn {
-  background-color: #4973ae;
-}
-
-.edit-btn:hover,
-.ai-btn:hover,
-.add-plan button:hover {
-  left:100%;
-  background-color: #0056b3;
-}
-
-.add-plan {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-/* Modal Styles */
-.modal-overlay,
-.itinerary-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content,
-.itinerary-content {
-  background-color: #f0f7f9;
-  padding: 50px;
-  border-radius: 20px;
-  max-width: 800px;
-  width: 100%;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  font-family: 'Arial', sans-serif;
-  text-align: left;
-}
-
-h2 {
   font-size: 28px;
-  color: #000a79;
-  margin-bottom: 30px;
+  color: #333;
+  font-weight: bold;
   text-align: center;
 }
 
-.form-group {
+.plan-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.plan-item {
+  background-color: #ffffff;
   margin-bottom: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-.form-group label {
-  display: block;
-  font-size: 18px;
-  color: #004d40;
-  margin-bottom: 10px;
-  font-weight: bold;
+.plan-item:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
 }
 
-.form-group input,
-.form-group textarea {
-  width: 100%;
-  padding: 15px;
-  border: 1px solid #00796b;
+.plan-overview {
+  margin-bottom: 15px;
+}
+
+.plan-date {
+  color: #888;
+  font-weight: 500;
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5cm;
+}
+
+.button-group button {
+  background-color: #bdc3c7;
+  color: white;
+  border: none;
+  padding: 10px 16px;
   border-radius: 8px;
   font-size: 14px;
-  background-color: #ffffff;
-  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-textarea {
-  height: 100px;
+.button-group button:hover {
+  background-color: #95a5a6;
+  transform: scale(1.05);
 }
 
-.form-group input:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: #004d40;
-  box-shadow: 0 0 10px rgba(0, 77, 64, 0.2);
+.ai-btn {
+  background-color: #9b59b6;
 }
 
-/* Modal Actions */
-.modal-actions {
-  display: flex;
-  justify-content: space-between;
+.details-btn {
+  background-color: #f39c12;
+}
+
+.plan-details {
+  background-color: #fafafa;
+  padding: 25px;
   margin-top: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.save-btn,
-.delete-btn,
 .close-btn {
-  padding: 10px 40px;
-  font-size: 14px;
-  border-radius: 6px;
+  background-color: #e74c3c;
+  color: white;
   border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
   cursor: pointer;
 }
 
-.save-btn {
-  background-color: #00796b;
-  color: white;
-  font-weight: bold;
-}
-
-.save-btn:hover {
-  background-color: #004d40;
-}
-
-.delete-btn {
-  background-color: #dc3545;
-  color: white;
-  font-weight: bold;
-}
-
-.delete-btn:hover {
-  background-color: #c82333;
-}
-
-.close-btn {
-  background-color: #333;
-  color: white;
-  padding: 10px;
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-
 .close-btn:hover {
-  background-color: #555;
+  background-color: #c0392b;
 }
 
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
 </style>

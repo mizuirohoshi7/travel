@@ -2,9 +2,11 @@ package travel.domain;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import travel.domain.*;
+import java.util.List;
 
-//<<< PoEAA / Repository
 @RepositoryRestResource(collectionResourceRel = "follows", path = "follows")
-public interface FollowRepository
-    extends PagingAndSortingRepository<Follow, Long> {}
+public interface FollowRepository extends PagingAndSortingRepository<Follow, Long> {
+
+    // Custom query to find all follow relationships by the follower's ID (fromId)
+    List<Follow> findByFromId(Long fromId);
+}

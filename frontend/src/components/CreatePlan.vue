@@ -1,8 +1,7 @@
 <template>
   <div class="create-plan">
     <img src="@/assets/home.png" alt="Home" class="home-btn" @click="goToMainPage" />
-    <h1>Create a new plan</h1>
-
+    <h1>Create a New Plan</h1>
     <form @submit.prevent="createPlan">
       <div class="form-group">
         <label for="location">Destination</label>
@@ -20,7 +19,7 @@
       </div>
 
       <div class="form-group">
-        <label for="travelDate">Travel date</label>
+        <label for="travelDate">Travel Date</label>
         <input v-model="plan.travelDate" type="date" id="travelDate" required />
       </div>
 
@@ -29,19 +28,19 @@
         <textarea v-model="plan.details" id="details" placeholder="Add additional details"></textarea>
       </div>
 
-      <button type="submit" class="save-btn">Save plan</button>
+      <button type="submit" class="save-btn">Save Plan</button>
     </form>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import PlanService from '@/services/PlanService';
 
 export default {
   data() {
     return {
       plan: {
-        memberId: 1, // 임시로 설정, 실제로는 로그인한 사용자의 ID를 사용해야 합니다.
+        memberId: 1, // 로그인한 사용자의 ID를 설정해야 함
         location: '',
         groupSize: 1,
         budget: 0,
@@ -53,17 +52,19 @@ export default {
   methods: {
     async createPlan() {
       if (!this.plan.location || !this.plan.travelDate) {
-        alert('필수 필드를 모두 입력해주세요.');
+        alert('Please fill in all required fields.');
         return;
       }
 
       try {
-        const response = await axios.post('/plans', this.plan);
-        console.log('Plan created:', response.data);
-        this.$router.push({ name: 'PlanManagement', params: { newPlanId: response.data.id } });
+        const response = await PlanService.createPlan(this.plan);
+        const newPlan = response.data;
+
+        // PlanManagement 페이지로 이동하면서 새 계획을 query로 전달
+        this.$router.push({ name: 'PlanManagement', query: { newPlan: JSON.stringify(newPlan) } });
       } catch (error) {
         console.error('Error creating plan:', error);
-        alert('계획 생성 중 오류가 발생했습니다.');
+        alert('An error occurred while creating the plan.');
       }
     },
     goToMainPage() {
@@ -117,9 +118,7 @@ textarea {
   transition: border 0.3s ease;
 }
 
-input[type="text"]:focus,
-input[type="number"]:focus,
-input[type="date"]:focus,
+input:focus,
 textarea:focus {
   border-color: #007bff;
   outline: none;
@@ -147,26 +146,6 @@ textarea {
 
 .save-btn:hover {
   background-color: #0056b3;
-}
-
-.save-btn:focus {
-  outline: none;
-  box-shadow: 0 0 10px rgba(55, 135, 220, 0.5);
-}
-
-@media (max-width: 768px) {
-  .create-plan {
-    padding: 20px;
-  }
-
-  h1 {
-    font-size: 24px;
-  }
-
-  .save-btn {
-    font-size: 16px;
-    padding: 12px;
-  }
 }
 
 .home-btn {

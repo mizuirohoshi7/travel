@@ -27,20 +27,12 @@ public class Member {
 
     private String email;
 
-    private Integer tokenAmount;
+    private Integer tokenAmount = 5000;
 
     @PostPersist
     public void onPostPersist() {
         MemberCreated memberCreated = new MemberCreated(this);
         memberCreated.publishAfterCommit();
-
-        TokenDecreased tokenDecreased = new TokenDecreased(this);
-        tokenDecreased.publishAfterCommit();
-
-        TokenDecreasingFailed tokenDecreasingFailed = new TokenDecreasingFailed(
-            this
-        );
-        tokenDecreasingFailed.publishAfterCommit();
     }
 
     @PostUpdate

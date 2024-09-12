@@ -15,4 +15,7 @@ public class FollowView {
     @Id
     //@GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
+
+    private Long fromId;  // The follower's ID (who is following)
+    private Long toId;    // The ID of the user being followed
 }

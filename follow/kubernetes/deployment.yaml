@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: follow
-          image: "username/follow:latest"
+          image: "gbgb45/follow:240912"
           ports:
             - containerPort: 8080
           readinessProbe:

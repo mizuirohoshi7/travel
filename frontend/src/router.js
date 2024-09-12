@@ -1,40 +1,52 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import MainPage from './components/MainPage.vue'; // 메인 페이지 컴포넌트
-import PlanManagement from './components/PlanManagement.vue'; // 계획 관리 컴포넌트
-import CreatePlan from './components/CreatePlan.vue'; // 계획 생성 컴포넌트
-import LoginPage from './components/LoginPage.vue'; // 로그인 페이지 추가
-import MyPage from './components/MyPage.vue'; // 마이 페이지 추가
-
+import MainPage from './components/MainPage.vue';
+import PlanManagement from './components/PlanManagement.vue';
+import CreatePlan from './components/CreatePlan.vue';
+import EditPlan from './components/EditPlan.vue'; // EditPlan 컴포넌트 추가
+import LoginPage from './components/LoginPage.vue';
+import MyPage from './components/MyPage.vue';
+import signup from './components/signup.vue';
 Vue.use(Router);
 
 export default new Router({
-  mode: 'history', // 브라우저 히스토리 모드 사용
+  mode: 'history',
   routes: [
     {
-      path: '/', // 기본 경로를 MainPage로 설정
+      path: '/',
       name: 'MainPage',
       component: MainPage,
     },
     {
-      path: '/plan-management', // 계획 관리 화면 경로
+      path: '/plan-management',
       name: 'PlanManagement',
       component: PlanManagement,
     },
     {
-      path: '/create-plan', // 계획 생성 화면 경로
+      path: '/create-plan',
       name: 'CreatePlan',
       component: CreatePlan,
     },
     {
-      path: '/login', // 로그인 페이지 경로 추가
+      path: '/edit-plan/:id', // EditPlan 라우트 추가
+      name: 'EditPlan',
+      component: EditPlan,
+      props: true, // URL 파라미터를 props로 전달
+    },
+    {
+      path: '/login',
       name: 'LoginPage',
       component: LoginPage,
     },
     {
-      path: '/mypage', // 마이 페이지 경로 추가
+      path: '/mypage',
       name: 'MyPage',
       component: MyPage,
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: signup, // SignupPage 컴포넌트 추가
     },
   ],
 });

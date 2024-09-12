@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: plan
-          image: "username/plan:latest"
+          image: "gbgb45/plan:240912"
           ports:
             - containerPort: 8080
           readinessProbe:

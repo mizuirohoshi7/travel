@@ -73,26 +73,43 @@ public class Plan {
         }
         Plan plan = planOptional.get();
 
-        String openAiToken = "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";
+        String openAiToken = "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";
 
         try {
-            String prompt = "당신은 개인 맞춤형 여행 계획 전문가입니다. 다음 정보를 바탕으로 상세한 여행 계획을 제안해주세요:\n" +
-                "위치: " + plan.getLocation() + "\n" +
-                "여행 날짜: " + plan.getTravelDate() + "\n" +
-                "예산: " + plan.getBudget() + "원\n" +
-                "그룹 크기: " + plan.getGroupSize() + "명\n" +
-                "추가 세부사항: " + plan.getDetails() + "\n\n" +
-                "다음 형식으로 응답해주세요:\n" +
-                "1. 여행 개요\n" +
-                "2. 일자별 세부 계획 (각 일자마다):\n" +
-                "   - 추천 활동 및 관광지\n" +
-                "   - 식사 추천\n" +
-                "   - 예상 소요 시간 및 비용\n" +
-                "3. 숙박 추천\n" +
-                "4. 교통 수단 추천\n" +
-                "5. 예산 분배 제안\n" +
-                "6. 현지 문화 및 주의사항 팁\n" +
-                "7. 추가 추천 사항 (선택적 활동, 쇼핑, 등)";
+            String prompt = "당신은 독특하고 잊지 못할 경험을 제공하는 '모험 여행 설계사'입니다. 다음 정보를 바탕으로 흥미진진한 여행 계획을 만들어주세요:\n\n" +
+            "• 여행지: " + plan.getLocation() + "\n" +
+            "• 여행 기간: " + plan.getTravelDate() + "\n" +
+            "• 예산: " + plan.getBudget() + "원\n" +
+            "• 여행자 수: " + plan.getGroupSize() + "명\n" +
+            "• 선호 활동 및 특별 요청: " + plan.getDetails() + "\n\n" +
+            "아래 항목을 포함한 독특한 여행 경험을 설계해주세요. 각 섹션에 제목을 붙이고, 내용을 명확하고 읽기 쉽게 구성해주세요:\n\n" +
+            "1. 여행 테마 및 개요\n" +
+            "   - 이 여행만의 특별한 콘셉트\n" +
+            "   - 잊지 못할 순간들의 미리보기\n\n" +
+            "2. 일자별 모험 일정\n" +
+            "   - 숨겨진 보석 같은 장소 추천\n" +
+            "   - 현지인만 아는 맛집\n" +
+            "   - 스릴 넘치는 액티비티 (패러글라이딩, 동굴 탐험 등)\n" +
+            "   - 골프 라운드 기회 (초보자부터 고수까지 맞춤 코스 추천)\n" +
+            "   - 예상 소요 시간 및 비용\n\n" +
+            "3. 이색적인 숙박 경험\n" +
+            "   - 트리하우스, 빙하 호텔 등 특별한 숙소 추천\n\n" +
+            "4. 환경 친화적 이동 수단\n" +
+            "   - 전기 자전거, 세그웨이 등 재미있는 교통수단 제안\n\n" +
+            "5. 창의적인 예산 활용 아이디어\n" +
+            "   - 현지 쿠폰, 패스 등을 활용한 절약 팁\n\n" +
+            "6. 문화 몰입 경험\n" +
+            "   - 전통 의상 체험, 현지인 집 방문 등\n\n" +
+            "7. 지역 특산품 및 수공예품 만들기 체험\n\n" +
+            "8. 시즌별 독특한 축제 및 이벤트 참여 방법\n\n" +
+            "9. 특별 추천 사항\n" +
+            "   - 일출/일몰 명소\n" +
+            "   - 인생샷 스팟\n" +
+            "   - 로컬 골프 클럽과의 교류 기회\n\n" +
+            "10. 위험 관리 및 현지 에티켓\n" +
+            "    - 안전 유의사항\n" +
+            "    - 문화적 주의점\n\n" +
+            "이 여행이 단순한 관광이 아닌 평생 간직할 추억이 되도록, 창의적이고 대담한 아이디어를 제시해주세요. 골프를 비롯한 다양한 활동이 자연스럽게 여행에 녹아들도록 설계해주세요. 각 섹션은 글머리 기호나 번호를 사용하여 구조화하고, 중요한 정보는 굵은 글씨로 강조해주세요.";
 
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
